@@ -1,52 +1,40 @@
 #include "cbuffer.h"
 #include <iostream>
 #include <cassert>
+#include <cstddef>
 
-bool test_push_less_n() {
-    try {
-        cbuffer<int> cb(5);
-        cb.push_back(1);
-        cb.push_back(2);
-        cb.push_back(3);
-        // TODO con operatore ==
-        return true;
-    } catch (...) {
-        throw;
-    }
-    
+int test_array[3] = {1, 2, 3};
+cbuffer<int> test_cb(3, test_array, test_array+3);
+
+char test_array2[5] = {'A', 'E', 'I', 'O', 'U'};
+cbuffer<char> test_cb2(5, test_array2, test_array2+5);
+
+void test_push_less_n() {
+    std::cout << "Test inserimento elementi <= max_size: ";
+    cbuffer<int> cb(3);
+    cb.push_back(1);
+    cb.push_back(2);
+    cb.push_back(3);
+    bool passed = cb.equals(test_cb);
+    std::cout << (passed ? "PASSED" : "FAILED") << std::endl;
 }
 
-bool test_push_more_n() {
-    try {
-        cbuffer<int> cb(5);
-        cb.push_back(1);
-        cb.push_back(2);
-        cb.push_back(3);
-        cb.push_back(4);
-        cb.push_back(5);
-        cb.push_back(6);
-        cb.push_back(7);
-        // TODO con operatore ==
-        return true;
-    } catch (...) {
-        throw;
-    }
-    
+void test_push_more_n() {
+    std::cout << "Test inserimento elementi > max_size: ";
+    cbuffer<char> cb(5);
+    cb.push_back('W');
+    cb.push_back('E');
+    cb.push_back('A');
+    cb.push_back('E');
+    cb.push_back('I');
+    cb.push_back('O');
+    cb.push_back('U');
+    bool passed = cb.equals(test_cb2);
+    std::cout << (passed ? "PASSED" : "FAILED") << std::endl;
 }
 
-bool test_iterator_constructor() {
-    try {
-        int array[3] = {2, 3, 4};
-        cbuffer<int> cb(3, array, array+3);
-        // TODO con operatore ==
-        return true;
-    } catch (...) {
-        throw;
-    }
-    
-}
-
-bool test_direct_access() {
+void test_direct_access() {
+    std::cout << "Test accesso diretto con operatore []: ";
     int array[4] = {2, 3, 4, 1};
     cbuffer<int> cb(4, array, array+4);
     int first = cb[0];
@@ -54,23 +42,60 @@ bool test_direct_access() {
     cb.push_back(7);
     int new_first = cb[0];
     int new_last = cb[3];
-    return first == 2 &&
-            last == 1 &&
-            new_first == 3 &&
-            new_last == 7;
+    bool passed = 
+        first == 2 &&
+        last == 1 &&
+        new_first == 3 &&
+        new_last == 7;
+    std::cout << (passed ? "PASSED" : "FAILED") << std::endl;
 }
 
 void test_output() {
+    std::cout << "Output cbuffer pieno: " << std::endl;
     int array[4] = {2, 3, 4, 1};
     cbuffer<int> cb(4, array, array+4);
+    cbuffer<int> cb_empty(3);
     std::cout << cb;
+    std::cout << "Output cbuffer vuoto: " << std::endl;
+    std::cout << cb_empty;
+}
+
+void test_modify_element() {
+    std::cout << "Test modifica elemento [] e iteratore: ";
+    int array[4] = {2, 3, 4, 1};
+    cbuffer<int> cb(4, array, array+4);
+    cb[2] = 7;
+    array[2] = 7;
+    *cb.begin() = 5;
+    array[0] = 5;
+    cbuffer<int> cb_a(4, array, array+4);
+    std::cout << (cb.equals(cb_a) ? "PASSED" : "FAILED") << std::endl;
+}
+
+void test_creazione_cb_da_cb() {
+    std::cout << "Test creazione buffer da un altro buffer pieno: ";
+    cbuffer<char> cb_s(4);
+    cb_s.push_back('A');
+    cb_s.push_back('2');
+    cb_s.push_back(66);
+    cb_s.push_back('$');
+    cbuffer<char>::iterator it, it_e;
+    it = cb_s.begin();
+    it_e = cb_s.end();
+    const cbuffer<char> cb_s2(4, it, it_e);
+    cbuffer<char>::const_iterator c_it, c_it_e;
+    c_it = cb_s2.begin();
+    c_it_e = cb_s2.end();
+    cbuffer<char> cb_s3(4, c_it, c_it_e);
+    std::cout << (cb_s.equals(cb_s2) && cb_s2.equals(cb_s3) ? "PASSED" : "FAILED") << std::endl;
 }
 
 int main() {
-    assert(test_push_less_n() && "Can't push less objects than max size");
-    assert(test_push_more_n() && "Error in deleting old and pushing new objects");
-    assert(test_iterator_constructor() && "Can't instantiate a cbuffer with iterators");
-    assert(test_direct_access() && "direct access not working correctly");
+    test_push_less_n();
+    test_push_more_n();
+    test_direct_access();
+    test_modify_element();
+    test_creazione_cb_da_cb();
     test_output();
     return 0;
 }
