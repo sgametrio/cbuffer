@@ -2,6 +2,7 @@
 #define CBUFFER_H
 
 #include <ostream>
+#include <iostream>
 
 /** \brief Buffer circolare
  * Implementa un buffer circolare di dimensione massima fissata contenente elementi di 
@@ -44,7 +45,7 @@ public:
      * @param other lista da copiare
      * @throw eccezione di fallita allocazione dinamica
      */
-    cbuffer(const cbuffer &other) : _head(NULL), _size(0), _max_size(other.max) {
+    cbuffer(const cbuffer &other) : _head(NULL), _size(0), _max_size(other._max_size) {
         const container *current = other._head;
         try {
             for (unsigned int i = 0; i < other._size; i++) {
@@ -211,6 +212,7 @@ public:
         clear();
     }
 
+    /** \brief iteratore di cbuffer (lettura e scrittura) */
     class iterator {
         private:
             /** \brief puntatore al container */
@@ -287,6 +289,7 @@ public:
             }
     };
 
+    /** \brief iteratore costante di cbuffer (sola lettura) */
     class const_iterator {
         private:
             /** \brief puntatore al container */
@@ -396,6 +399,9 @@ public:
     }
 };
 
+/** \brief Operatore di output 
+ * Operando con gli iteratori scorre il buffer e ne visualizza i dati
+ */
 template <class T>
 std::ostream &operator<<(std::ostream &os, const cbuffer<T> &cb) {
 	
@@ -403,8 +409,22 @@ std::ostream &operator<<(std::ostream &os, const cbuffer<T> &cb) {
 
 	for(i = cb.begin(), ie = cb.end(); i!=ie; i++)
 		os << *i << std::endl;
-        
+
 	return os;
+}
+
+/** \brief valuta il predicato unary_funct su ogni elemento di cb
+ * @param cb cbuffer sul quale viene valutato il predicato
+ * @param unary_funct funtore unario
+ * Stampa a video il risultato di unary_funct per ogni elemento di cb 
+ */
+template <class T, class F>
+void evaluate_if(const cbuffer<T> &cb, F unary_funct) {
+    typename cbuffer<T>::const_iterator it = cb.begin();
+    typename cbuffer<T>::const_iterator it_e = cb.end();
+    for(int i = 0; it != it_e; it++, i++) {
+        std::cout << i << ": " << (unary_funct(*it) ? "true" : "false") << std::endl;
+    }
 }
 
 #endif

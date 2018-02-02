@@ -3,7 +3,14 @@
 #include <cassert>
 #include <cstddef>
 
-int test_array[3] = {1, 2, 3};
+template <class T>
+struct is_zero{
+    bool operator()(const T &a) const {
+        return a == 0;
+    }
+};
+
+int test_array[3] = {1, 0, 3};
 cbuffer<int> test_cb(3, test_array, test_array+3);
 
 char test_array2[5] = {'A', 'E', 'I', 'O', 'U'};
@@ -12,10 +19,10 @@ cbuffer<char> test_cb2(5, test_array2, test_array2+5);
 void test_push_less_n() {
     std::cout << "Test inserimento elementi <= max_size: ";
     cbuffer<int> cb(3);
-    cb.push_back(1);
-    cb.push_back(2);
-    cb.push_back(3);
-    bool passed = cb.equals(test_cb);
+    cb.push_back(21);
+    cb.push_back(0);
+    cb.push_back(55);
+    bool passed = !cb.equals(test_cb);
     std::cout << (passed ? "PASSED" : "FAILED") << std::endl;
 }
 
@@ -90,6 +97,11 @@ void test_creazione_cb_da_cb() {
     std::cout << (cb_s.equals(cb_s2) && cb_s2.equals(cb_s3) ? "PASSED" : "FAILED") << std::endl;
 }
 
+void test_evaluate_if() {
+    std::cout << "evaluate_if con funtore is_zero: " << std::endl;
+    evaluate_if(test_cb, is_zero<int>());
+}
+
 int main() {
     test_push_less_n();
     test_push_more_n();
@@ -97,5 +109,6 @@ int main() {
     test_modify_element();
     test_creazione_cb_da_cb();
     test_output();
+    test_evaluate_if();
     return 0;
 }
