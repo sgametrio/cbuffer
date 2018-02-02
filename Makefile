@@ -1,7 +1,7 @@
 CPPFLAGS = -Wall -Wextra
 PROGRAM = program
 
-.PHONY: build clean debug program test leak_check
+.PHONY: build clean debug program test leak_check docs
 
 default: debug
 
@@ -18,6 +18,9 @@ main.o: main.cpp cbuffer.h
 
 debug: CPPFLAGS += -g
 debug: $(PROGRAM)
+
+docs: 
+	doxygen Doxyfile
 
 test: debug
 	./$(PROGRAM)
