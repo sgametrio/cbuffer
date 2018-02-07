@@ -40,6 +40,21 @@ void test_push_more_n() {
     std::cout << (passed ? "PASSED" : "FAILED") << std::endl;
 }
 
+void test_operator_equal() {
+    std::cout << "Test operatore = : ";
+    cbuffer<int> cb(3);
+    cb = test_cb;
+    bool passed = cb.equals(test_cb);
+    std::cout << (passed ? "PASSED" : "FAILED") << std::endl;
+}
+
+void test_copy_constructor() {
+    std::cout << "Test costruttore copia: ";
+    cbuffer<int> cb(test_cb);
+    bool passed = cb.equals(test_cb);
+    std::cout << (passed ? "PASSED" : "FAILED") << std::endl;
+}
+
 void test_direct_access() {
     std::cout << "Test accesso diretto con operatore []: ";
     int array[4] = {2, 3, 4, 1};
@@ -97,6 +112,11 @@ void test_creazione_cb_da_cb() {
     std::cout << (cb_s.equals(cb_s2) && cb_s2.equals(cb_s3) ? "PASSED" : "FAILED") << std::endl;
 }
 
+void test_pop() {
+    std::cout << "Test pop elemento: ";
+
+}
+
 void test_evaluate_if() {
     std::cout << "evaluate_if con funtore is_zero: " << std::endl;
     evaluate_if(test_cb, is_zero<int>());
@@ -108,6 +128,8 @@ int main() {
     test_direct_access();
     test_modify_element();
     test_creazione_cb_da_cb();
+    test_operator_equal();
+    test_copy_constructor();
     test_output();
     test_evaluate_if();
     return 0;

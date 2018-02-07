@@ -29,6 +29,8 @@ class cbuffer {
 
     /** \brief Puntatore alla testa del buffer */
     container *_head;
+    /** \brief Puntatore alla coda del buffer */
+    container *_tail;
     /** \brief Numero di elementi attualmente nel buffer */
     unsigned int _size;
     /** \brief Massimo numero di elementi contemporaneamente presenti nel buffer */
@@ -38,14 +40,14 @@ public:
     /** \brief Costruttore di default
      * Inizializza un buffer con dimensione massima a 10
      */
-    cbuffer(unsigned int max=10) : _head(NULL), _size(0), _max_size(max) {}
+    cbuffer(unsigned int max=10) : _head(NULL), _tail(NULL), _size(0), _max_size(max) {}
 
     /** \brief Costruttore copia
      * 
      * @param other lista da copiare
      * @throw eccezione di fallita allocazione dinamica
      */
-    cbuffer(const cbuffer &other) : _head(NULL), _size(0), _max_size(other._max_size) {
+    cbuffer(const cbuffer &other) : _head(NULL), _tail(NULL), _size(0), _max_size(other._max_size) {
         const container *current = other._head;
         try {
             for (unsigned int i = 0; i < other._size; i++) {
@@ -68,6 +70,7 @@ public:
     template <class IT>
     cbuffer(unsigned int max, IT begin, IT end) : _max_size(max) {
         _head = NULL;
+        _tail = NULL;
         _size = 0;
         try {
             for(; begin != end; begin++) {
@@ -88,13 +91,16 @@ public:
             _head = _head->next;
             _size--;
             delete old;
+            // Se ho eliminato l'unico elemento allora setto anche la coda a NULL
+            if (_head == NULL)
+                _tail = NULL;
         }
     }
 
     /** \brief Inserisce un elemento in coda
      * Se la lista è piena elimino l'elemento in testa e ne inserisco uno nuovo
-     * Se la lista è vuota, faccio puntare _head al nuovo elemento creato
-     * Altrimenti accodo semplicemente
+     * Se la lista è vuota, faccio puntare _head e _tail al nuovo elemento creato
+     * Altrimenti accodo semplicemente aggiornando il puntatore _tail
      * 
      * @param value Riferimento all'elemento di tipo T da inserire
      */
@@ -110,18 +116,16 @@ public:
         if (_head == NULL) {
             _head = temp;
             _size++;
+            _tail = temp;
             return;
         }
-        container *last = _head;
-        // Scorro fino in fondo per accodare il nodo in ultima posizione
-        for(unsigned int i = 1; i < _size; i++) {
-            last = last->next;
-        }
-        last->next = temp;
+        // Collego l'ultimo nodo e aggiorno la coda
+        _tail->next = temp;
+        _tail = temp;
         _size++;
         // Se ho appena riempito il buffer aggiorno il puntatore dell'ultimo alla testa
         if(_size == _max_size) {
-            temp->next = _head;
+            _tail->next = _head;
         }
     }
 
@@ -136,6 +140,21 @@ public:
             delete temp;
         }
         _size = 0;
+        _tail = NULL;
+    }
+
+    /** \brief Ritorna l'elemento in testa al buffer */
+    T& top() const {
+        if (_head == NULL)
+            return NULL;
+        return _head->value;
+    }
+
+    /** \brief Ritorna l'elemento in coda al buffer */
+    T& tail() const {
+        if (_tail == NULL)
+            return NULL;
+        return _tail->value;
     }
 
     /** \brief Numero di elementi presenti nel buffer */
@@ -173,6 +192,7 @@ public:
         if (this != &other) {
             cbuffer temp(other);
             std::swap(temp._head, _head);
+            std::swap(temp._tail, _tail);
             std::swap(temp._size, _size);
             std::swap(temp._max_size, _max_size);
         }
@@ -372,12 +392,9 @@ public:
      */
     iterator end() {
         // devo dire in tempo costante l'iteratore, non posso permettermi di ciclare tutto
-        if (_size == _max_size) {
-            // lista circolare -> end() == begin()
-            return iterator(_head);
-        } else {
+        if (_tail == NULL)
             return iterator(0);
-        }
+        return iterator(_tail->next);
     }
 
     /** \brief Iteratore dell'elemento in testa al buffer */
@@ -390,12 +407,9 @@ public:
      */
     const_iterator end() const {
         // devo dire in tempo costante l'iteratore, non posso permettermi di ciclare tutto
-        if (_size == _max_size) {
-            // lista circolare -> end() == begin()
-            return const_iterator(_head);
-        } else {
+        if (_tail == NULL)
             return const_iterator(0);
-        }
+        return const_iterator(_tail->next);
     }
 };
 
