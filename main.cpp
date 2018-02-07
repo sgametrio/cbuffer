@@ -15,6 +15,12 @@ struct rectangle {
     rectangle(unsigned int bb, unsigned int hh) : b(bb), h(hh) {}
 };
 
+struct is_square {
+    bool operator()(const rectangle &a) const {
+        return a.b == a.h;
+    }
+};
+
 std::ostream &operator<<(std::ostream &os, const rectangle &r) {
 	os << r.b << " " << r.h;
 	return os;
@@ -25,6 +31,9 @@ cbuffer<int> test_cb(3, test_array, test_array+3);
 
 char test_array2[5] = {'A', 'E', 'I', 'O', 'U'};
 cbuffer<char> test_cb2(5, test_array2, test_array2+5);
+
+cbuffer<rectangle> test_rect_cb(3);
+rectangle a(2, 3), b(3, 4), c(5, 5);
 
 void test_push_less_n() {
     std::cout << "Test inserimento elementi <= max_size: ";
@@ -140,6 +149,11 @@ void test_pop() {
 void test_evaluate_if() {
     std::cout << "evaluate_if con funtore is_zero: " << std::endl;
     evaluate_if(test_cb, is_zero<int>());
+    std::cout << "evaluate_if con funtore is_square su tipo rectangle: " << std::endl;
+    test_rect_cb.push_back(a);
+    test_rect_cb.push_back(b);
+    test_rect_cb.push_back(c);
+    evaluate_if(test_rect_cb, is_square());
 }
 
 int main() {
