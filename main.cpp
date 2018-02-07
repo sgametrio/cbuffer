@@ -4,11 +4,21 @@
 #include <cstddef>
 
 template <class T>
-struct is_zero{
+struct is_zero {
     bool operator()(const T &a) const {
         return a == 0;
     }
 };
+
+struct rectangle {
+    unsigned int b, h;
+    rectangle(unsigned int bb, unsigned int hh) : b(bb), h(hh) {}
+};
+
+std::ostream &operator<<(std::ostream &os, const rectangle &r) {
+	os << r.b << " " << r.h;
+	return os;
+}
 
 int test_array[3] = {1, 0, 3};
 cbuffer<int> test_cb(3, test_array, test_array+3);
@@ -24,6 +34,16 @@ void test_push_less_n() {
     cb.push_back(55);
     bool passed = !cb.equals(test_cb);
     std::cout << (passed ? "PASSED" : "FAILED") << std::endl;
+}
+
+void test_push_rectangle() {
+    std::cout << "Test e output elementi custom: " << std::endl;
+    cbuffer<rectangle> cb(3);
+    rectangle a(2, 3), b(3, 4), c(5, 5);
+    cb.push_back(a);
+    cb.push_back(b);
+    cb.push_back(c);
+    std::cout << cb;
 }
 
 void test_push_more_n() {
@@ -131,6 +151,7 @@ int main() {
     test_operator_equal();
     test_copy_constructor();
     test_output();
+    test_push_rectangle();
     test_evaluate_if();
     return 0;
 }
