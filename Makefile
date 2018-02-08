@@ -33,6 +33,6 @@ release: clean
 	npx markdown-pdf Relazione.md
 	rm -rf 807894
 	mkdir 807894
-	rsync -av --progress . 807894 --exclude 807894
-	rm -rf 807894/.git 807894/.vscode 807894/.gitignore 807894/Esame-180219.pdf 807894/*.tar.gz 807894/Relazione.md
+	rsync -av --progress . 807894 --exclude=807894 --exclude=Qt --exclude=.git --exclude=.vscode --exclude=.gitignore --exclude=Esame-180219.pdf --exclude=*.tar.gz --exclude=Relazione.md
+	rsync -av --progress Qt/persone/ 807894/Qt --exclude=persone.pro.user
 	tar -cvzf 807894.tar.gz 807894
