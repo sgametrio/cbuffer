@@ -23,6 +23,7 @@ struct is_square {
     }
 };
 
+/** \brief Operatore di stream per la struct `rectangle` */
 std::ostream &operator<<(std::ostream &os, const rectangle &r) {
 	os << r.b << " " << r.h;
 	return os;
