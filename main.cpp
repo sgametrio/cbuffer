@@ -3,6 +3,7 @@
 #include <cassert>
 #include <cstddef>
 
+/** \brief Funtore che, dato un oggetto di tipo T mi dice se è 0 */
 template <class T>
 struct is_zero {
     bool operator()(const T &a) const {
@@ -15,6 +16,7 @@ struct rectangle {
     rectangle(unsigned int bb, unsigned int hh) : b(bb), h(hh) {}
 };
 
+/** \brief Funtore che, dato un oggetto `rectangle` mi dice se è quadrato */
 struct is_square {
     bool operator()(const rectangle &a) const {
         return a.b == a.h;
@@ -43,6 +45,7 @@ void test_push_less_n() {
     cb.push_back(55);
     bool passed = !cb.equals(test_cb);
     std::cout << (passed ? "PASSED" : "FAILED") << std::endl;
+    std::cout << cb;
 }
 
 void test_push_rectangle() {
@@ -65,8 +68,10 @@ void test_push_more_n() {
     cb.push_back('I');
     cb.push_back('O');
     cb.push_back('U');
+    cb.push_back('z');
     bool passed = cb.equals(test_cb2);
     std::cout << (passed ? "PASSED" : "FAILED") << std::endl;
+    std::cout << cb;
 }
 
 void test_operator_equal() {
@@ -99,6 +104,7 @@ void test_direct_access() {
         new_first == 3 &&
         new_last == 7;
     std::cout << (passed ? "PASSED" : "FAILED") << std::endl;
+    std::cout << cb;
 }
 
 void test_output() {
@@ -112,19 +118,19 @@ void test_output() {
 }
 
 void test_modify_element() {
-    std::cout << "Test modifica elemento [] e iteratore: ";
+    std::cout << "Test modifica elemento [] e iteratore: " << std::endl << "PRIMA" << std::endl;
     int array[4] = {2, 3, 4, 1};
     cbuffer<int> cb(4, array, array+4);
+    std::cout << cb;
     cb[2] = 7;
     array[2] = 7;
     *cb.begin() = 5;
     array[0] = 5;
-    cbuffer<int> cb_a(4, array, array+4);
-    std::cout << (cb.equals(cb_a) ? "PASSED" : "FAILED") << std::endl;
+    std::cout << "DOPO" << std::endl << cb;
 }
 
 void test_creazione_cb_da_cb() {
-    std::cout << "Test creazione buffer da un altro buffer pieno: ";
+    std::cout << "Test creazione buffer da un altro buffer pieno: " << std::endl << "Buffer 1" << std::endl;
     cbuffer<char> cb_s(4);
     cb_s.push_back('A');
     cb_s.push_back('2');
@@ -137,13 +143,15 @@ void test_creazione_cb_da_cb() {
     cbuffer<char>::const_iterator c_it, c_it_e;
     c_it = cb_s2.begin();
     c_it_e = cb_s2.end();
-    cbuffer<char> cb_s3(4, c_it, c_it_e);
-    std::cout << (cb_s.equals(cb_s2) && cb_s2.equals(cb_s3) ? "PASSED" : "FAILED") << std::endl;
+    std::cout << cb_s << "Buffer 2" << std::endl << cb_s2;
 }
 
 void test_pop() {
-    std::cout << "Test pop elemento: ";
-
+    std::cout << "Test pop elemento: " << std::endl << "PRIMA" << std::endl;
+    cbuffer<int> cb(test_cb);
+    std::cout << cb;
+    cb.pop();
+    std::cout << "DOPO" << std::endl << cb;
 }
 
 void test_evaluate_if() {
@@ -165,6 +173,7 @@ int main() {
     test_operator_equal();
     test_copy_constructor();
     test_output();
+    test_pop();
     test_push_rectangle();
     test_evaluate_if();
     return 0;

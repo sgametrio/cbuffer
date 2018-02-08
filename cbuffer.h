@@ -123,10 +123,6 @@ public:
         _tail->next = temp;
         _tail = temp;
         _size++;
-        // Se ho appena riempito il buffer aggiorno il puntatore dell'ultimo alla testa
-        if(_size == _max_size) {
-            _tail->next = _head;
-        }
     }
 
     /** \brief Dealloca il buffer
@@ -237,12 +233,10 @@ public:
         private:
             /** \brief puntatore al container */
             container *current;
-            /** \brief variabile di supporto per gli operatori di confronto */
-            bool _head_tail;
         public:
-            iterator() : current(NULL), _head_tail(true) {}
-            iterator(container *curr) : current(curr), _head_tail(true) {}
-            iterator(const iterator &other) : current(other.current), _head_tail(other._head_tail) {}
+            iterator() : current(NULL) {}
+            iterator(container *curr) : current(curr) {}
+            iterator(const iterator &other) : current(other.current) {}
 
             ~iterator() {
                 current = NULL;
@@ -264,12 +258,9 @@ public:
              * @param other iteratore da confrontare
              * due iteratori sono diversi se:
              * - puntano a due cose diverse
-             * OPPURE
-             * - è la prima iterazione e non puntano a NULL
              */
             bool operator!=(const iterator &other) const {
-                
-                return (_head_tail && current != NULL) || current != other.current;
+                return current != other.current;
             }
 
             /** \brief Operatore di uguaglianza 
@@ -283,27 +274,22 @@ public:
             /** \brief Operatore di assegnamento */
             iterator& operator=(const iterator &other) {
                 current = other.current;
-                _head_tail = other._head_tail;
                 return *this;
             }
 
             /** \brief Operatore di pre-incremento
-             * Setta _head_tail a false per indicare che abbiamo fatto una modifica
              * Passa al container successivo, ritornando sè stesso
              */
             iterator& operator++() {
-                _head_tail = false;
                 current = current->next;
                 return *this;
             }
 
             /** \brief Operatore di post-incremento
-             * Setta _head_tail a false per indicare che abbiamo fatto una modifica
              * Passa al container successivo ma ritorna sè stesso prima dell'incremento
              */
             iterator operator++(int) {
                 iterator it(*this);
-                _head_tail = false;
                 current = current->next;
                 return it;
             }
@@ -314,12 +300,10 @@ public:
         private:
             /** \brief puntatore al container */
             const container *current;
-            /** \brief variabile di supporto per gli operatori di confronto */
-            bool _head_tail;
         public:
-            const_iterator() : current(NULL), _head_tail(true) {}
-            const_iterator(container *curr) : current(curr), _head_tail(true) {}
-            const_iterator(const const_iterator &other) : current(other.current), _head_tail(other._head_tail) {}
+            const_iterator() : current(NULL) {}
+            const_iterator(container *curr) : current(curr) {}
+            const_iterator(const const_iterator &other) : current(other.current) {}
 
             /** \brief Dereferenziamento
              * Ritorna il dato riferito dall'iteratore 
@@ -337,12 +321,10 @@ public:
              * @param other iteratore da confrontare
              * due iteratori sono diversi se:
              * - puntano a due cose diverse
-             * OPPURE
-             * - è la prima iterazione e non puntano a NULL
              */
             bool operator!=(const const_iterator &other) const {
                 
-                return (_head_tail && current != NULL) || current != other.current;
+                return current != other.current;
             }
 
             /** \brief Operatore di uguaglianza 
@@ -354,11 +336,9 @@ public:
             }
 
             /** \brief Operatore di pre-incremento
-             * Setta _head_tail a false per indicare che abbiamo fatto una modifica
              * Passa al container successivo, ritornando sè stesso
              */
             const_iterator& operator++() {
-                _head_tail = false;
                 current = current->next;
                 return (*this);
             }
@@ -366,7 +346,6 @@ public:
             /** \brief Operatore di assegnamento */
             const_iterator& operator=(const const_iterator &other) {
                 current = other.current;
-                _head_tail = other._head_tail;
                 return *this;
             }
 
@@ -376,7 +355,6 @@ public:
              */
             const_iterator operator++(int) {
                 const_iterator it(*this);
-                _head_tail = false;
                 current = current->next;
                 return it;
             }
@@ -387,29 +365,19 @@ public:
         return iterator(_head);
     }
 
-    /** \brief Iteratore dell'elemento dopo l'elemento in coda al buffer
-     * Essendo un buffer circolare, se pieno, end() punterà al primo elemento 
-     */
+    /** \brief Iteratore che indica la fine del buffer */
     iterator end() {
-        // devo dire in tempo costante l'iteratore, non posso permettermi di ciclare tutto
-        if (_tail == NULL)
-            return iterator(0);
-        return iterator(_tail->next);
+        return iterator(0);
     }
 
-    /** \brief Iteratore dell'elemento in testa al buffer */
+    /** \brief Iteratore costante dell'elemento in testa al buffer */
     const_iterator begin() const {
         return const_iterator(_head);
     }
 
-    /** \brief Iteratore dell'elemento dopo l'elemento in coda al buffer
-     * Essendo un buffer circolare, se pieno, end() punterà al primo elemento 
-     */
+    /** \brief Iteratore costante che indica la fine del buffer */
     const_iterator end() const {
-        // devo dire in tempo costante l'iteratore, non posso permettermi di ciclare tutto
-        if (_tail == NULL)
-            return const_iterator(0);
-        return const_iterator(_tail->next);
+        return const_iterator(0);
     }
 };
 

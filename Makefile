@@ -30,7 +30,7 @@ leak_check: debug
 
 # Only for my environment to build out the correct .tar.gz ready to be deployed
 release: clean
-	npx markdown-pdf Relazione.md
+	pandoc -f markdown Relazione.md -t latex -o Relazione.pdf
 	rm -rf 807894
 	mkdir 807894
 	rsync -av --progress . 807894 --exclude=807894 --exclude=Qt --exclude=.git --exclude=.vscode --exclude=.gitignore --exclude=Esame-180219.pdf --exclude=*.tar.gz --exclude=Relazione.md
