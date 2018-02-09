@@ -122,11 +122,15 @@ void test_modify_element() {
     std::cout << "Test modifica elemento [] e iteratore: " << std::endl << "PRIMA" << std::endl;
     int array[4] = {2, 3, 4, 1};
     cbuffer<int> cb(4, array, array+4);
+    cbuffer<int>::iterator it = cb.begin();
     std::cout << cb;
     cb[2] = 7;
     array[2] = 7;
-    *cb.begin() = 5;
+    *it = 5;
+    it = it+2;
+    bool passed = *it == 7;
     array[0] = 5;
+    std::cout << (passed ? "operatore + funzionante su iteratori" : "Errore operatore + su iteratori") << std::endl;
     std::cout << "DOPO" << std::endl << cb;
 }
 

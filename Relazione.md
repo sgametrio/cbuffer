@@ -13,7 +13,7 @@ Il progetto richiede di dover implementare un buffer circolare di dimensione fis
 ### cbuffer
 Ho scelto di utilizzare una lista di nodi `container` i quali puntano al nodo container successivo e contengono il valore dell'elemento di tipo `T`. Non ho utilizzato una lista circolare ma una semplice lista perchè la circolarità crea complessità nella gestione degli iteratori e non aggiunge niente di richiesto. Infatti per i nostri scopi, collegare `_head` e `_tail` (primo e ultimo elemento) non ci è di nessun aiuto. L'importante è gestire in modo corretto l'inserimento di nuovi elementi a buffer pieno simulando la circolarità (eliminando l'elemento più vecchio e inserendo in coda quello nuovo). Avrei potuto utilizzare un array ma la lista mi garantisce maggiore flessibilità sia nell'allocazione dinamica dei nodi `container` effettivamente occupati sia nell'eliminazione in testa e nell'inserimento in coda che sono immediati visto l'utilizzo di due puntatori `_head` e `_tail`.
 
-In costruzione viene fissato l'attributo `_max_size` che rappresenta la massima capacità del buffer. Non viene allocata memoria per tutta la capacità del buffer, solo al momento dell'inserimento dell'elemento effettivo per non sprecare memoria. `_size` è il numero effettivo degli elementi attualmente all'interno del buffer. Il buffer è pieno quando `_size` è uguale a `_max_size`. Questi due attributi vengono dichiarati `unsigned` perchè non ha senso esprimere le dimensioni con un numero negativo.
+In costruzione viene fissato l'attributo `_max_size` che rappresenta la massima capacità del buffer. Non viene allocata memoria per tutta la capacità del buffer, solo al momento dell'inserimento dell'elemento si ha un'effettiva allocazione dinamica. `_size` è il numero effettivo degli elementi attualmente all'interno del buffer. Il buffer è pieno quando `_size` è uguale a `_max_size`. Questi due attributi vengono dichiarati `unsigned` perchè non ha senso esprimere le dimensioni con un numero negativo.
 
 La scelta di utilizzare due puntatori `_head` e `_tail` è dovuta al fatto di poter inserire e rimuovere in tempo costante un elemento.
 
@@ -22,7 +22,9 @@ E' possibile accedere agli elementi tramite operatori `[]` anche se l'accesso no
 
 ### container
 E' la struct base che costituisce il nodo della lista e contiene:
+
 * `value`: elemento di tipo `T`
+
 * `next`: puntatore al prossimo nodo
 
 Il suo compito è quello di salvare le informazioni base e di permettere lo scorrimento della lista tramite puntatori.

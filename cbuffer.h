@@ -168,10 +168,16 @@ public:
      * @param i posizione dell'elemento
      * @throw eccezione posizione non accessibile
      */
-    T& operator[](unsigned int i) {
-        if (i >= _size) {
-            throw("Posizione non istanziata o non accessibile");
+    T& operator[](unsigned int i) const {
+        try {
+            if (i >= _size) {
+                throw;
+            }
+        } catch (...) {
+            std::cerr << "Index out of range" << std::endl;
+            throw;
         }
+        
         container *current = _head;
         for (unsigned int j = 0; j < i; j++) {
             current = current->next;
@@ -182,7 +188,6 @@ public:
     /** \brief Operatore di assegnamento
      * @param other cbuffer da copiare
      * @return reference a this
-     * @throw eccezione di memoria
      */
     cbuffer& operator=(const cbuffer &other) {
         if (this != &other) {
@@ -293,6 +298,29 @@ public:
                 current = current->next;
                 return it;
             }
+
+            /** \brief Operatore binario di incremento
+             * Avanza di `offset` posizioni.
+             * @throw out of bound exception
+             */
+            iterator operator+(unsigned int offset) {
+                unsigned int i = 0;
+                while (current != NULL && i < offset) {
+                    current = current->next;
+                    i++;
+                }
+                // Tiro un'eccezione se sto accedendo a una cella non valida
+                // cioè se non ho ancora finito di ciclare (i < offset)
+                try {
+                    if (i < offset)
+                        throw;
+                } catch (...) {
+                    std::cerr << "Index out of range" << std::endl;
+                    throw;
+                }
+                
+                return *this;
+            }
     };
 
     /** \brief iteratore costante di cbuffer (sola lettura) */
@@ -357,6 +385,28 @@ public:
                 const_iterator it(*this);
                 current = current->next;
                 return it;
+            }
+
+            /** \brief Operatore binario di incremento
+             * Avanza di `offset` posizioni.
+             * @throw out of bound exception
+             */
+            const_iterator operator+(unsigned int offset) {
+                unsigned int i = 0;
+                while (current != NULL && i < offset) {
+                    current = current->next;
+                    i++;
+                }
+                // Tiro un'eccezione se sto accedendo a una cella non valida
+                // cioè se non ho ancora finito di ciclare (i < offset)
+                try {
+                    if (i < offset)
+                        throw;
+                } catch (...) {
+                    std::cerr << "Index out of range" << std::endl;
+                    throw;
+                }
+                return *this;
             }
     };
 
