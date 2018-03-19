@@ -3,6 +3,8 @@
 
 #include <ostream>
 #include <iostream>
+#include <iterator>
+#include <cstddef>
 
 /** \brief Buffer circolare
  * Implementa un buffer circolare di dimensione massima fissata contenente elementi di 
@@ -154,12 +156,12 @@ public:
     }
 
     /** \brief Numero di elementi presenti nel buffer */
-    unsigned int size() {
+    unsigned int size() const {
         return _size;
     }
 
     /** \brief Numero massimo di elementi allocabili nel buffer */
-    unsigned int capacity() {
+    unsigned int capacity() const {
         return _max_size;
     }
 
@@ -225,7 +227,7 @@ public:
      * @param other lista da confrontare
      */
     bool operator!=(const cbuffer &other) const {
-        return !(this == other);
+        return !(this == &other);
     }
 
     /** \brief Distruttore che richiama clear() */
@@ -233,12 +235,23 @@ public:
         clear();
     }
 
+    class const_iterator;
+
     /** \brief iteratore di cbuffer (lettura e scrittura) */
     class iterator {
         private:
             /** \brief puntatore al container */
             container *current;
         public:
+
+            friend class const_iterator;
+
+            typedef std::forward_iterator_tag   iterator_category;
+            typedef T                           value_type;
+            typedef ptrdiff_t                   difference_type;
+            typedef T*                          pointer;
+            typedef T&                          reference;
+
             iterator() : current(NULL) {}
             iterator(container *curr) : current(curr) {}
             iterator(const iterator &other) : current(other.current) {}
@@ -250,12 +263,12 @@ public:
             /** \brief Dereferenziamento
              * Ritorna il dato riferito dall'iteratore 
              */
-            T& operator*() const {
+            reference operator*() const {
                 return current->value;
             }
 
             /** \brief Ritorna il puntatore al dato di tipo T dell'elemento puntato */
-            T* operator->() const {
+            pointer operator->() const {
                 return &(current->value);
             }
 
@@ -268,17 +281,37 @@ public:
                 return current != other.current;
             }
 
+            /** \brief Operatore di non uguaglianza 
+             * @param other iteratore da confrontare
+             * due iteratori sono diversi se:
+             * - puntano a due cose diverse
+             */
+            bool operator!=(const const_iterator &other) const {
+                const_iterator c(*this);
+                return c.current != other.current;
+            }
+
             /** \brief Operatore di uguaglianza 
              * @param other iteratore da confrontare
              * Richiama l'operatore != e lo nega
              */
             bool operator==(const iterator &other) const {
-                return !(this != other);
+                return !(this != &other);
             }
 
+            /** \brief Operatore di uguaglianza 
+             * @param other iteratore da confrontare
+             * Richiama l'operatore != e lo nega
+             */
+            bool operator==(const const_iterator &other) const {
+                const_iterator c(*this);
+                return !(c != &other);
+            }
+            
             /** \brief Operatore di assegnamento */
             iterator& operator=(const iterator &other) {
-                current = other.current;
+                if (this != &other)
+                    current = other.current;
                 return *this;
             }
 
@@ -329,19 +362,26 @@ public:
             /** \brief puntatore al container */
             const container *current;
         public:
+            typedef std::forward_iterator_tag   iterator_category;
+            typedef const T                     value_type;
+            typedef ptrdiff_t                   difference_type;
+            typedef const T*                    pointer;
+            typedef const T&                    reference;
+
             const_iterator() : current(NULL) {}
             const_iterator(container *curr) : current(curr) {}
+            const_iterator(const iterator &other) : current(other.current) {}
             const_iterator(const const_iterator &other) : current(other.current) {}
 
             /** \brief Dereferenziamento
              * Ritorna il dato riferito dall'iteratore 
              */
-            const T& operator*() const {
+            reference operator*() const {
                 return current->value;
             }
 
             /** \brief Ritorna il puntatore al dato di tipo T dell'elemento puntato */
-            const T* operator->() const {
+            pointer operator->() const {
                 return &(current->value);
             }
 
@@ -351,8 +391,17 @@ public:
              * - puntano a due cose diverse
              */
             bool operator!=(const const_iterator &other) const {
-                
                 return current != other.current;
+            }
+
+            /** \brief Operatore di non uguaglianza 
+             * @param other iteratore da confrontare
+             * due iteratori sono diversi se:
+             * - puntano a due cose diverse
+             */
+            bool operator!=(const iterator &other) const {
+                const_iterator c(other);
+                return current != c.current;
             }
 
             /** \brief Operatore di uguaglianza 
@@ -360,7 +409,16 @@ public:
              * Richiama l'operatore != e lo nega
              */
             bool operator==(const const_iterator &other) const {
-                return !(this != other);
+                return !(this != &other);
+            }
+
+            /** \brief Operatore di uguaglianza 
+             * @param other iteratore da confrontare
+             * Richiama l'operatore != e lo nega
+             */
+            bool operator==(const iterator &other) const {
+                const_iterator c(other);
+                return !(this != &c);
             }
 
             /** \brief Operatore di pre-incremento
@@ -373,7 +431,8 @@ public:
 
             /** \brief Operatore di assegnamento */
             const_iterator& operator=(const const_iterator &other) {
-                current = other.current;
+                if (this != &other)
+                    current = other.current;
                 return *this;
             }
 

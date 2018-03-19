@@ -31,8 +31,9 @@ std::ostream &operator<<(std::ostream &os, const rectangle &r) {
 
 int test_array[3] = {1, 0, 3};
 cbuffer<int> test_cb(3, test_array, test_array+3);
+const cbuffer<int> const_test_cb(3, test_array, test_array+3);
 
-char test_array2[5] = {'A', 'E', 'I', 'O', 'U'};
+char test_array2[5] = {'E', 'I', 'O', 'U', 'z'};
 cbuffer<char> test_cb2(5, test_array2, test_array2+5);
 
 cbuffer<rectangle> test_rect_cb(3);
